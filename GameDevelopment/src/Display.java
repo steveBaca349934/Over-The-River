@@ -153,7 +153,7 @@ public class Display extends Canvas implements Runnable {
 			return;
 		}
 
-		screen.render(game);
+		screen.render();
 
 		for (int i = 0; i < Width * Height; i++) {
 			pixels[i] = screen.pixels[i];
@@ -176,9 +176,9 @@ public class Display extends Canvas implements Runnable {
 
 	public static void main(String[] args) {
 
-		Display game = new Display();
+		Display display = new Display();
 		JFrame frame = new JFrame();
-		frame.add(game);
+		frame.add(display);
 		frame.pack();
 		frame.setSize(Width, Height);
 		frame.setTitle(Title);
@@ -187,7 +187,7 @@ public class Display extends Canvas implements Runnable {
 
 		frame.setResizable(false);
 		frame.setVisible(true);
-		game.start();
+		display.start();
 
 	}
 

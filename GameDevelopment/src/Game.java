@@ -18,8 +18,6 @@ public class Game {
 	}
 	
 	
-	
-
 	public void tick(boolean[] key) {
 		time += .50;
 		boolean forward = key[KeyEvent.VK_W];

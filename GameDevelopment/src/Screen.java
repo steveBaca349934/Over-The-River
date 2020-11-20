@@ -11,7 +11,7 @@ public class Screen extends Render {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void render(Game game) {
+	public void render() {
 
 		render3d.floor();
 		render3d.rednerDistanceLimiter();
