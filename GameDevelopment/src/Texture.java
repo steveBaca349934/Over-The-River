@@ -1,0 +1,27 @@
+import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
+
+public class Texture {
+
+	public static Render floor = loadBitmap("/imgonline-com-ua-TextureSeamless-h5uA5XaK58.png");
+	public static Render wall = loadBitmap("/wall.png");
+
+	private static Render loadBitmap(String fileName) {
+		try {
+			BufferedImage image = ImageIO.read(Texture.class.getResource(fileName));
+			int width = image.getWidth();
+			int height = image.getHeight();
+
+			Render result = new Render(width, height);
+			image.getRGB(0, 0, width, height, result.pixels, 0, width);
+			return result;
+
+		} catch (Exception e) {
+			System.out.println("shit");
+			throw new RuntimeException(e);
+			// TODO: handle exception
+		}
+	}
+
+}
