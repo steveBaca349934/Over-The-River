@@ -94,7 +94,7 @@ public class Display extends Canvas implements Runnable {
 				unprocessedSeconds -= secondsPerTick;
 				tick = true;
 				tickCount++;
-				if (tickCount % 60 == 0) {
+				if (tickCount % 100 == 0) {
 					System.out.println(this.frames + " " + "FPS");
 					previousTime += 1000;
 					this.frames = 0;
@@ -161,7 +161,7 @@ public class Display extends Canvas implements Runnable {
 
 		Graphics g = bs.getDrawGraphics();
 		g.drawImage(BI, 0, 0, Width + 10, Height + 10, null);
-		if (game.time % 100 == 0) {
+		if (game.time % 60 == 0) {
 			g.drawString(Integer.toString(frames) + "FPS", 0, 20);
 		}
 		g.dispose();

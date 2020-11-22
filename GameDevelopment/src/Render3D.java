@@ -27,8 +27,6 @@ public class Render3D extends Render {
 		double ceilingPosition = 20.0;
 		double rotation = Game.getGame().controller.rotation;
 		double jump = Game.getGame().controller.y;
-		double cosine = Math.cos(rotation);
-		double sine = Math.sin(rotation);
 		double forward = Game.getGame().controller.z;
 		double right = Game.getGame().controller.x;
 		double up = Game.getGame().controller.y;
@@ -55,7 +53,7 @@ public class Render3D extends Render {
 
 		for (int y = 0; y < height; y++) {
 
-			double ceiling = (y + -height / 2.0) / height;
+			double ceiling = (y - height / 2.0) / height;
 
 			double z = (floorPosition + jump) / ceiling;
 			// System.out.println(z + "" + "this is after hitting jump button");
@@ -64,19 +62,46 @@ public class Render3D extends Render {
 			}
 
 			for (int x = 0; x < width; x++) {
-				double depth = (x - width) / 2.0 / height;
+				double depth = (x - width / 2.0) / height;
 				depth *= z;
 				double xx = depth * cosine + z * sine;
 				double yy = z * cosine - depth * sine;
+
+				// System.out.println(yy);
 				int xPix = (int) (xx + right);
 				int yPix = (int) (yy + forward);
 
 				zBuffer[x + y * width] = z;
+
 				pixels[x + y * width] = Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
+
+				// Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
 
 				if (z > 200) {
 					pixels[x + y * width] = 0;
 				}
+			}
+
+		}
+
+	}
+
+	/**
+	 * Attempting to recreate the floor method in order to get it right because
+	 * right now the game isn't really rendering properly Right now when you try and
+	 * move you go diagonoly instead of forward
+	 */
+	public void floorTest() {
+		for (int y = 0; y < height; y++) {
+			double ceiling = (y - height / 2.0) / height;
+			double z = 8.0 / ceiling;
+
+			for (int x = 0; x < width; x++) {
+				double depth = (x - width / 2.0) / height;
+				depth *= z;
+				int xx = (int) (depth) & 15;
+				int yy = (int) (z) & 15;
+				pixels[x + y * width] = (xx * 16) | (yy * 16) << 8;
 			}
 
 		}
@@ -93,38 +118,37 @@ public class Render3D extends Render {
 	 * @param yHeight
 	 */
 	public void renderWall(double xLeft, double xRight, double zDistance, double yHeight) {
-		
+
 		double[] gameControlsArray = Render3D.distributeGameControlsLocally();
 
 		double rotation = gameControlsArray[2];
-		double jump = gameControlsArray[3];
 		double cosine = Math.cos(rotation);
 		double sine = Math.sin(rotation);
 		double forward = gameControlsArray[4];
 		double right = gameControlsArray[5];
 		double up = gameControlsArray[6];
-		
+
 		// xfLeft -> Left calculation
-		double xcLeft = ((xLeft) - right) * 2;
+		double xcLeft = ((xLeft) - right) * 2.0;
 		// zcLeft -> Zedd calculation
-		double zcLeft = ((zDistance) - forward) * 2;
+		double zcLeft = ((zDistance) - forward) * 2.0;
 
 		double rotLeftSideX = xcLeft * cosine - zcLeft * sine;
 
-		double yCornerTL = ((-yHeight) - up) * 2;
-		double yCornerBL = ((+0.5 - yHeight) - up) * 2;
+		double yCornerTL = ((-yHeight) - up) * 2.0;
+		double yCornerBL = ((+0.5 - yHeight) - up) * 2.0;
 		double rotLeftSideZ = zcLeft * cosine + xcLeft * sine;
 
-		double xcRight = ((xRight) - right) * 2;
-		double zcRight = ((zDistance) - forward) * 2;
+		double xcRight = ((xRight) - right) * 2.0;
+		double zcRight = ((zDistance) - forward) * 2.0;
 
-		double rotRightSideX = xcRight - xcRight * cosine - zcRight * sine;
-		double yCornerTR = ((-yHeight) - up) * 2;
-		double yCornerBR = ((+0.5 - yHeight) - up) * 2;
+		double rotRightSideX = xcRight * cosine - zcRight * sine;
+		double yCornerTR = ((-yHeight) - up) * 2.0;
+		double yCornerBR = ((+0.5 - yHeight) - up) * 2.0;
 		double rotRightSideZ = zcRight * cosine + xcRight * sine;
 
-		double xPixelLeft = (rotLeftSideX / rotLeftSideZ * height + width / 2);
-		double xPixelRight = (rotRightSideX / rotRightSideX * height + width / 2);
+		double xPixelLeft = (rotLeftSideX / rotLeftSideZ * height + width / 2.0);
+		double xPixelRight = (rotRightSideX / rotRightSideZ * height + width / 2.0);
 
 		// if left pixels overlap with the right pixels, then return aka get out of this
 		// method
@@ -148,10 +172,10 @@ public class Render3D extends Render {
 		}
 
 		// casting previously made variables into integer variables
-		double yPixelLeftTop = (yCornerTL / rotLeftSideX * height + height / 2);
-		double yPixelLeftBottom = (yCornerBL / rotLeftSideZ * height + height / 2);
-		double yPixelRightTop = (yCornerTR / rotRightSideZ * height + height / 2);
-		double yPixelRightBottom = (yCornerBR / rotRightSideZ * height + height / 2);
+		double yPixelLeftTop = (int) (yCornerTL / rotLeftSideZ * height + height / 2.0);
+		double yPixelLeftBottom = (int) (yCornerBL / rotLeftSideZ * height + height / 2.0);
+		double yPixelRightTop = (int) (yCornerTR / rotRightSideZ * height + height / 2.0);
+		double yPixelRightBottom = (int) (yCornerBR / rotRightSideZ * height + height / 2.0);
 
 		// This part of the method will actually render the pixels
 		for (int x = xPixelLeftInt; x < xPixelRightInt; x++) {
@@ -170,10 +194,10 @@ public class Render3D extends Render {
 				yPixelTopInt = height;
 			}
 
-			/*
-			 * for (int y = yPixelTopInt; y < yPixelBottomInt; y++) { //pixels[x + y *
-			 * width] = 0x06c98f; zBuffer[x + y * width] = 0; }
-			 */
+			for (int y = yPixelTopInt; y < yPixelBottomInt; y++) {
+				pixels[x + y * width] = 0x06c98f;
+				zBuffer[x + y * width] = 0;
+			}
 
 		}
 

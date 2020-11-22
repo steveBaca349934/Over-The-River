@@ -22,13 +22,13 @@ public class Render {
 			for (int x = 0; x < render.width; x++) {
 				int xPix = x + xOffset;
 				if (xPix < 0 || xPix >= Display.Width)
-				continue;
+					continue;
 
 				int alpha = render.pixels[x + y * render.width];
 //Alpha support allows for pixels that don't contain any value 
-				if (alpha > 0) {
+				//if (alpha > 0) {
 					pixels[xPix + yPix * width] = alpha;
-				}
+				//}
 			}
 		}
 
