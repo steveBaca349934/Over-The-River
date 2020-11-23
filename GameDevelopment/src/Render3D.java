@@ -43,7 +43,8 @@ public class Render3D extends Render {
 	/**
 	 * @author stevebaca
 	 * @since 11/22
-	 * 
+	 * Right now this is rendering both the floor and the ceiling which is obviously not ideal... going to try and figure out how to 
+	 * render the ceiling seperately
 	 */
 	public void floor() {
 
@@ -57,7 +58,6 @@ public class Render3D extends Render {
 		double sine = Math.sin(rotation);
 		double forward = gameControlsArray[4];
 		double right = gameControlsArray[5];
-		double up = gameControlsArray[6];
 
 		for (int y = 0; y < height; y++) {
 
@@ -78,13 +78,68 @@ public class Render3D extends Render {
 				// System.out.println(yy);
 				int xPix = (int) (xx + right);
 				int yPix = (int) (yy + forward);
+				
 
 				zBuffer[x + y * width] = z;
 
-				pixels[x + y * width] = Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
+				pixels[x  + y * width] = Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
 
 				// Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
 
+				if (z > 200) {
+					pixels[x + y * width] = 0;
+				}
+			}
+
+		}
+
+	}
+	
+	/**
+	 * @author stevebaca
+	 * @since 11/22
+	 * Right now this is rendering both the floor and the ceiling which is obviously not ideal... going to try and figure out how to 
+	 * render the ceiling seperately
+	 */
+	public void ceiling() {
+
+		double[] gameControlsArray = Render3D.distributeGameControlsLocally();
+
+		double floorPosition = gameControlsArray[0];
+		double ceilingPosition = gameControlsArray[1];
+		double rotation = gameControlsArray[2];
+		double jump = gameControlsArray[3];
+		double cosine = Math.cos(rotation);
+		double sine = Math.sin(rotation);
+		double forward = gameControlsArray[4];
+		double right = gameControlsArray[5];
+
+		for (int y = 0; y < height/2; y++) {
+
+			double ceiling = (y - height / 1.65) / height;
+
+			double z = (floorPosition + jump) / ceiling;
+			// System.out.println(z + "" + "this is after hitting jump button");
+			if (ceiling < 0) {
+				z = (ceilingPosition - jump) / -ceiling;
+			}
+
+			for (int x = 0; x < width; x++) {
+				double depth = (x - width / 2.0) / height;
+				depth *= z;
+				double xx = depth * cosine + z * sine;
+				double yy = z * cosine - depth * sine;
+
+				// System.out.println(yy);
+				int xPix = (int) (xx + right);
+				int yPix = (int) (yy + forward);
+
+				zBuffer[x + y * width] = z;
+
+				pixels[x  + y * width] = Texture.ceiling.pixels[(xPix & 100) + (yPix & 100) * 800];
+
+				// Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
+				
 				if (z > 200) {
 					pixels[x + y * width] = 0;
 				}
@@ -225,6 +280,57 @@ public class Render3D extends Render {
 
 		}
 
+	}
+	
+	
+	/**
+	 * @author stevebaca
+	 * @since 11/22
+	 * Trying to render a sword for my first person character.....
+	 */
+	public void sword() {
+		double[] gameControlsArray = Render3D.distributeGameControlsLocally();
+		int length = 10;
+		int width = 5;
+		
+		double rotation = gameControlsArray[2];
+		double jump = gameControlsArray[3];
+		double cosine = Math.cos(rotation);
+		double sine = Math.sin(rotation);
+		double forward = gameControlsArray[4];
+		double right = gameControlsArray[5];
+
+		for (int y = 0; y < length; y++) {
+
+			double swordLength = y;
+
+			double z = 1.2;
+			
+
+			for (int x = 0; x < 5; x++) {
+				double depth = x;
+				depth *= z;
+				double xx = depth * cosine + z * sine;
+				double yy = z * cosine - depth * sine;
+
+				// System.out.println(yy);
+				int xPix = (int) (xx + right);
+				int yPix = (int) (yy + forward);
+				
+
+				//zBuffer[x + y * width] = z;
+
+				pixels[x  + y * width] = 0xa597a8;
+
+				// Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
+
+			}
+
+		}
+		
+		
+		
+		
 	}
 
 	public void rednerDistanceLimiter() {

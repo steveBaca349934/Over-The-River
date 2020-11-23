@@ -6,6 +6,7 @@ public class Texture {
 
 	public static Render floor = loadBitmap("/imgonline-com-ua-TextureSeamless-h5uA5XaK58.png");
 	public static Render wall = loadBitmap("/wall.png");
+	public static Render ceiling = loadBitmap("/blue sky jpeg.png");
 
 	private static Render loadBitmap(String fileName) {
 		try {
