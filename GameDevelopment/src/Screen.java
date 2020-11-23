@@ -11,10 +11,10 @@ public class Screen extends Render {
 	}
 
 	public void render() {
-		//render3d.floorTest();
+		// render3d.floorTest();
 		render3d.floor();
+		render3d.renderWall(0, 2, 1, 0, 0);
 		render3d.rednerDistanceLimiter();
-		render3d.renderWall(0, 1, 2, 1);
 		draw(render3d, 0, 0);
 
 	}
