@@ -1,26 +1,31 @@
 package gui;
+
 import java.awt.event.KeyEvent;
 import inputHandler.*;
+import level.Level;
 
 public class Game {
 	public int time;
 	public Controller controller;
-	
-	//private constructor
-		private Game() {
-			controller = Controller.getController();
-		}
+	public Level level;
 
-	//semi singleton instance
+	// private constructor
+	private Game() {
+		controller = Controller.getController();
+		level = new Level(20, 20);
+	}
+
+	// semi singleton instance
 	private static Game game = new Game();
-	
-	//singleton accessor method
+
+	// singleton accessor method
 	public static Game getGame() {
 		return game;
 	}
-	
+
 	/**
-	 * @param key this is a boolean array that is filled with whether every possible action is true or false at any given time....
+	 * @param key this is a boolean array that is filled with whether every possible
+	 *            action is true or false at any given time....
 	 */
 	public void tick(boolean[] key) {
 		time += .50;

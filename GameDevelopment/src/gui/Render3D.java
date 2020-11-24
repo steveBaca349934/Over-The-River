@@ -1,14 +1,19 @@
 package gui;
 
+import level.Block;
+import level.Level;
+
 public class Render3D extends Render {
 
 	public double[] zBuffer;
 	private int renderDistance = 5000;
+	private Game game;
 
 	public Render3D(int width, int height) {
 		super(width, height);
 		zBuffer = new double[width * height + 1];
 		// TODO Auto-generated constructor stub
+		game = Game.getGame();
 	}
 
 	/**
@@ -38,14 +43,11 @@ public class Render3D extends Render {
 
 	}
 
-	
-	
-	
 	/**
 	 * @author stevebaca
-	 * @since 11/22
-	 * Right now this is rendering both the floor and the ceiling which is obviously not ideal... going to try and figure out how to 
-	 * render the ceiling seperately
+	 * @since 11/22 Right now this is rendering both the floor and the ceiling which
+	 *        is obviously not ideal... going to try and figure out how to render
+	 *        the ceiling seperately
 	 */
 	public void floor() {
 
@@ -79,11 +81,10 @@ public class Render3D extends Render {
 				// System.out.println(yy);
 				int xPix = (int) (xx + right);
 				int yPix = (int) (yy + forward);
-				
 
 				zBuffer[x + y * width] = z;
 
-				pixels[x  + y * width] = Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
+				pixels[x + y * width] = Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
 
 				// Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
 
@@ -95,12 +96,12 @@ public class Render3D extends Render {
 		}
 
 	}
-	
+
 	/**
 	 * @author stevebaca
-	 * @since 11/22
-	 * Right now this is rendering both the floor and the ceiling which is obviously not ideal... going to try and figure out how to 
-	 * render the ceiling seperately
+	 * @since 11/22 Right now this is rendering both the floor and the ceiling which
+	 *        is obviously not ideal... going to try and figure out how to render
+	 *        the ceiling seperately
 	 */
 	public void ceiling() {
 
@@ -115,7 +116,7 @@ public class Render3D extends Render {
 		double forward = gameControlsArray[4];
 		double right = gameControlsArray[5];
 
-		for (int y = 0; y < height/2; y++) {
+		for (int y = 0; y < height / 2; y++) {
 
 			double ceiling = (y - height / 1.65) / height;
 
@@ -137,35 +138,13 @@ public class Render3D extends Render {
 
 				zBuffer[x + y * width] = z;
 
-				pixels[x  + y * width] = Texture.ceiling.pixels[(xPix & 100) + (yPix & 100) * 800];
+				pixels[x + y * width] = Texture.ceiling.pixels[(xPix & 100) + (yPix & 100) * 800];
 
 				// Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
-				
+
 				if (z > 200) {
 					pixels[x + y * width] = 0;
 				}
-			}
-
-		}
-
-	}
-
-	/**
-	 * Attempting to recreate the floor method in order to get it right because
-	 * right now the game isn't really rendering properly Right now when you try and
-	 * move you go diagonoly instead of forward
-	 */
-	public void floorTest() {
-		for (int y = 0; y < height; y++) {
-			double ceiling = (y - height / 2.0) / height;
-			double z = 8.0 / ceiling;
-
-			for (int x = 0; x < width; x++) {
-				double depth = (x - width / 2.0) / height;
-				depth *= z;
-				int xx = (int) (depth) & 15;
-				int yy = (int) (z) & 15;
-				pixels[x + y * width] = (xx * 16) | (yy * 16) << 8;
 			}
 
 		}
@@ -191,11 +170,10 @@ public class Render3D extends Render {
 		double forward = gameControlsArray[4];
 		double right = gameControlsArray[5];
 		double up = gameControlsArray[6];
-		
+
 		double upCorrect = 0.062;
 		double rightCorrect = 0.062;
 		double forwardCorrect = 0.062;
-
 
 		// xfLeft -> Left calculation
 		double xcLeft = ((xLeft) - (right * rightCorrect)) * 2.0;
@@ -218,6 +196,31 @@ public class Render3D extends Render {
 
 		double xPixelLeft = (rotLeftSideX / rotLeftSideZ * height + width / 2.0);
 		double xPixelRight = (rotRightSideX / rotRightSideZ * height + width / 2.0);
+
+		// clipping handler
+		double tex30 = 0;
+		double tex40 = 8;
+		double clip = 0.5;
+
+		if (rotLeftSideZ < clip && rotRightSideZ < clip) {
+			return;
+		}
+
+		if (rotLeftSideZ < clip) {
+			double clip0 = (clip - rotLeftSideZ) / (rotRightSideZ - rotLeftSideZ);
+			rotLeftSideZ = rotLeftSideZ + (rotRightSideZ - rotLeftSideZ) * clip0;
+			rotLeftSideX = rotLeftSideX + (rotRightSideX - rotLeftSideX) * clip0;
+			tex30 = tex30 + (tex40 - tex30) * clip0;
+
+		}
+
+		if (rotRightSideZ < clip) {
+			double clip0 = (clip - rotLeftSideZ) / (rotRightSideZ - rotLeftSideZ);
+			rotRightSideZ = rotLeftSideZ + (rotRightSideZ - rotLeftSideZ) * clip0;
+			rotRightSideZ = rotLeftSideX + (rotRightSideX - rotLeftSideX) * clip0;
+			tex30 = tex30 + (tex40 - tex30) * clip0;
+
+		}
 
 		// if left pixels overlap with the right pixels, then return aka get out of this
 		// method
@@ -273,7 +276,10 @@ public class Render3D extends Render {
 			for (int y = yPixelTopInt; y < yPixelBottomInt; y++) {
 				double pixelRotationY = (y - yPixelTop) / (yPixelBottom - yPixelTop);
 				int yTexture = (int) (8 * pixelRotationY);
-				pixels[x + y * width] = xTexture * 100 + yTexture * 100 * 256;
+
+				pixels[x + y * width] = Texture.wall.pixels[(xTexture & 100) + (yTexture & 100) * 8];
+
+				// pixels[x + y * width] = xTexture * 100 + yTexture * 100 * 256;
 
 				zBuffer[x + y * width] = 1 / (tex1 + (tex2 - tex1) * pixelRotation) * 16;
 
@@ -282,18 +288,16 @@ public class Render3D extends Render {
 		}
 
 	}
-	
-	
+
 	/**
 	 * @author stevebaca
-	 * @since 11/22
-	 * Trying to render a sword for my first person character.....
+	 * @since 11/22 Trying to render a sword for my first person character.....
 	 */
 	public void sword() {
 		double[] gameControlsArray = Render3D.distributeGameControlsLocally();
-		int length = 10;
-		int width = 5;
-		
+		int length = 100;
+		int width = 50;
+
 		double rotation = gameControlsArray[2];
 		double jump = gameControlsArray[3];
 		double cosine = Math.cos(rotation);
@@ -306,9 +310,8 @@ public class Render3D extends Render {
 			double swordLength = y;
 
 			double z = 1.2;
-			
 
-			for (int x = 0; x < 5; x++) {
+			for (int x = 0; x < width; x++) {
 				double depth = x;
 				depth *= z;
 				double xx = depth * cosine + z * sine;
@@ -317,21 +320,15 @@ public class Render3D extends Render {
 				// System.out.println(yy);
 				int xPix = (int) (xx + right);
 				int yPix = (int) (yy + forward);
-				
 
-				//zBuffer[x + y * width] = z;
+				zBuffer[x + y * width] = 1;
 
-				pixels[x  + y * width] = 0xa597a8;
-
-				// Texture.floor.pixels[(xPix & 7) + (yPix & 7) * 8];
+				pixels[x + y * width] = 0xa597a8;
 
 			}
 
 		}
-		
-		
-		
-		
+
 	}
 
 	public void rednerDistanceLimiter() {
@@ -357,6 +354,45 @@ public class Render3D extends Render {
 
 			pixels[i] = r << 16 | g << 8 | b;
 		}
+	}
+
+	/**
+	 * @author stevebaca
+	 * @since 11/24
+	 */
+	public void levelInstantiator() {
+		Level level = game.level;
+
+		int size = 5;
+
+		for (int xBlock = -size; xBlock <= size; xBlock++) {
+			for (int zBlock = -size; zBlock <= size; zBlock++) {
+				Block block = level.create(xBlock, zBlock);
+				Block east = level.create(xBlock + 1, zBlock);
+				Block south = level.create(xBlock, zBlock + 1);
+
+				if (block.solid) {
+					if (!east.solid) {
+						renderWall(xBlock + 1, xBlock + 1, zBlock, zBlock + 1, 0);
+					}
+
+					if (!south.solid) {
+						renderWall(xBlock + 1, xBlock, zBlock, zBlock + 1, 0);
+					}
+				} else {
+					if (east.solid) {
+						renderWall(xBlock + 1, xBlock + 1, zBlock + 1, zBlock, 0);
+
+					}
+					if (south.solid) {
+						renderWall(xBlock, xBlock + 1, zBlock + 1, zBlock + 1, 0);
+
+					}
+				}
+
+			}
+		}
+
 	}
 
 }

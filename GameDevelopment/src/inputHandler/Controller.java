@@ -1,4 +1,5 @@
 package inputHandler;
+
 public class Controller {
 
 	public double x = 0, z = 0, y = 0, rotation = 0, xa = 0, za = 0, rotationa = 0;
@@ -25,12 +26,10 @@ public class Controller {
 		return controller;
 	}
 
-	
-	
 	/**
 	 * @author stevebaca
-	 * @since 11/23
-	 * No idea why in the world this is called tick, it just doesn't make any sense at all....
+	 * @since 11/23 No idea why in the world this is called tick, it just doesn't
+	 *        make any sense at all....
 	 * 
 	 * @param forward
 	 * @param back
@@ -42,7 +41,7 @@ public class Controller {
 	 */
 	public void tick(boolean forward, boolean back, boolean left, boolean right, boolean jump, boolean crouch,
 			boolean sprint) {
-		double rotationSpeed = .01, walkSpeed = 0.5, jumpHeight = 0.5;
+		double rotationSpeed = .000065 * mouseSpeed, walkSpeed = 0.5, jumpHeight = 0.5;
 		double xMove = 0, zMove = 0;
 
 		if (forward) {
@@ -100,7 +99,6 @@ public class Controller {
 
 	}
 
-	
 	/**
 	 * handles rotation through mouse movement
 	 */
@@ -117,6 +115,8 @@ public class Controller {
 			Controller.turnLeft = false;
 
 		}
+		
+		// speeds mouse movement up if you move the mouse faster
 		mouseSpeed = Math.abs(newX - newY);
 
 		oldX = newX;
