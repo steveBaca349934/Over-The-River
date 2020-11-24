@@ -1,4 +1,6 @@
+package gui;
 import java.awt.event.KeyEvent;
+import inputHandler.*;
 
 public class Game {
 	public int time;
@@ -6,7 +8,7 @@ public class Game {
 	
 	//private constructor
 		private Game() {
-			controller = new Controller();
+			controller = Controller.getController();
 		}
 
 	//semi singleton instance
@@ -17,7 +19,9 @@ public class Game {
 		return game;
 	}
 	
-	
+	/**
+	 * @param key this is a boolean array that is filled with whether every possible action is true or false at any given time....
+	 */
 	public void tick(boolean[] key) {
 		time += .50;
 		boolean forward = key[KeyEvent.VK_W];

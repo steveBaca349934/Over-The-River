@@ -1,3 +1,5 @@
+package gui;
+import main.Display;
 
 public class Render {
 

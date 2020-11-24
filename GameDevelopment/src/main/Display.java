@@ -1,3 +1,4 @@
+package main;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -5,16 +6,16 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import inputHandler.*;
+import gui.*;
 
 public class Display extends Canvas implements Runnable {
 
-	/**
-	 * 
-	 */
+	//The class where everything is compiled and put together 
+	
 	private static final long serialVersionUID = 4573326356792377108L;
-	static int Width = 800;
-	static int Height = 600;
+	public static int Width = 800;
+	public static int Height = 600;
 	static String Title = "Beyond the River";
 
 	private Thread thread;
@@ -25,10 +26,8 @@ public class Display extends Canvas implements Runnable {
 	private int[] pixels;
 	private Game game;
 	private inputHandler input;
-	private int newX = 0;
-	private int newY = 0;
-	private int oldX = 0;
-	private int oldY = 0;
+	private Controller controller;
+	
 	private int frames;
 
 	public Display() {
@@ -44,6 +43,7 @@ public class Display extends Canvas implements Runnable {
 		addFocusListener(input);
 		addMouseListener(input);
 		addMouseMotionListener(input);
+		controller = Controller.getController();
 
 	}
 
@@ -108,43 +108,16 @@ public class Display extends Canvas implements Runnable {
 			}
 			render();
 			frames++;
-			newX = inputHandler.mouseX;
-			if (newX > oldX) {
-				Controller.turnRight = true;
-			}
-			if (newX < oldX) {
-				Controller.turnLeft = true;
-			}
-			if (newX == oldX) {
-				Controller.turnRight = false;
-				Controller.turnLeft = false;
+			controller.rotationHandler();
 
-			}
-			oldX = newX;
-
-			newY = inputHandler.mouseY;
-			if (newY > oldY) {
-				// System.out.println("Up");
-				Controller.up = true;
-			}
-			if (newY < oldY) {
-				// System.out.println("Down");
-				Controller.down = true;
-
-			}
-			if (newY == oldY) {
-				// System.out.println("Still!!!!!");
-				Controller.up = false;
-				Controller.down = false;
-
-			}
-			oldY = newY;
-
-			// newY = inputHandler.mouseY;
 		}
 
 	}
 
+	
+	/**
+	 * Filling an array that is currently empty/constructed in this class will pixels form the Screen class
+	 */
 	private void render() {
 
 		BufferStrategy bs = this.getBufferStrategy();
@@ -161,13 +134,21 @@ public class Display extends Canvas implements Runnable {
 
 		Graphics g = bs.getDrawGraphics();
 		g.drawImage(BI, 0, 0, Width + 10, Height + 10, null);
+		
+		// printing frames per second every 60 seconds
 		if (game.time % 60 == 0) {
 			g.drawString(Integer.toString(frames) + "FPS", 0, 20);
 		}
+		
+		
 		g.dispose();
 		bs.show();
 	}
 
+	
+	/**
+	 * 
+	 */
 	private void tick() {
 
 		game.tick(input.key);

@@ -1,3 +1,4 @@
+package inputHandler;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -11,6 +12,7 @@ public class inputHandler implements KeyListener, FocusListener, MouseListener, 
 	public boolean[] key = new boolean[68836];
 	public static int mouseX;
 	public static int mouseY;
+	public static int mouseButton;
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
@@ -20,22 +22,15 @@ public class inputHandler implements KeyListener, FocusListener, MouseListener, 
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		//These getX/Y means that they are relative to the actual screen
+		// These getX/Y means that they are relative to the actual screen
 		mouseX = e.getX();
 		mouseY = e.getY();
-		
-		
-		 
-		
-		
-		
-		
+
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		mouseButton = e.getButton();
 	}
 
 	@Override
@@ -70,7 +65,7 @@ public class inputHandler implements KeyListener, FocusListener, MouseListener, 
 
 	@Override
 	public void focusLost(FocusEvent e) {
-		
+
 		for (int i = 0; i < key.length; i++) {
 			key[i] = false;
 		}

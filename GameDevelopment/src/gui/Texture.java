@@ -1,3 +1,4 @@
+package gui;
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
