@@ -194,8 +194,7 @@ public class Render3D extends Render {
 		double yCornerBR = ((+0.5 - yHeight) - (-up * upCorrect)) * 2.0;
 		double rotRightSideZ = zcRight * cosine + xcRight * sine;
 
-		double xPixelLeft = (rotLeftSideX / rotLeftSideZ * height + width / 2.0);
-		double xPixelRight = (rotRightSideX / rotRightSideZ * height + width / 2.0);
+
 
 		// clipping handler
 		double tex30 = 0;
@@ -217,10 +216,13 @@ public class Render3D extends Render {
 		if (rotRightSideZ < clip) {
 			double clip0 = (clip - rotLeftSideZ) / (rotRightSideZ - rotLeftSideZ);
 			rotRightSideZ = rotLeftSideZ + (rotRightSideZ - rotLeftSideZ) * clip0;
-			rotRightSideZ = rotLeftSideX + (rotRightSideX - rotLeftSideX) * clip0;
-			tex30 = tex30 + (tex40 - tex30) * clip0;
+			rotRightSideX = rotLeftSideX + (rotRightSideX - rotLeftSideX) * clip0;
+			tex40 = tex30 + (tex40 - tex30) * clip0;
 
 		}
+		
+		double xPixelLeft = (rotLeftSideX / rotLeftSideZ * height + width / 2.0);
+		double xPixelRight = (rotRightSideX / rotRightSideZ * height + width / 2.0);
 
 		// if left pixels overlap with the right pixels, then return aka get out of this
 		// method
